@@ -246,7 +246,7 @@ def plot_choices(a_agents, bias=0, lapse=0):
     xl[1] = max(xl[1], bias+.5)
     ax.plot([xl[0],bias], np.ones(2)*lapse/2, color="gray", label="P(go right)")
     ax.plot([bias,xl[1]], 1-np.ones(2)*lapse/2, color="gray")
-    ax.plot([bias, bias], [lapse/2, 1-lapse/2], color="gray")
+    ax.plot([bias, bias], [lapse/2, 1-lapse/2], color="gray", linestyle="--")
     ax.set_xlabel("Accumulation value, a")
     ax.set_ylabel("P(go right)")
     ax.legend(loc='upper center', ncol=3, bbox_to_anchor=(.5 ,1.5))
