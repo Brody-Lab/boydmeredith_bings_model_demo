@@ -87,8 +87,10 @@ def plot_clicktrain(bups):
     left_rate = bups['left_rate']
     right_rate = bups['right_rate']
     duration = bups['duration']
+    
     fig, ax = plt.subplots( figsize=(4,3.5))
     ax1 = ax
+    #ax1.set_position([.2, .2, .8, .8])
     ax1.eventplot(left_bups,lineoffsets=-.5,color="blue", alpha=.5)
     ax1.eventplot(right_bups,lineoffsets=.5,color="red", alpha=.5)
     ax1.plot(left_bups,-np.ones_like(left_bups), "o", color="blue", alpha=.5, label=f"r_L={left_rate:.2f} Hz")
@@ -101,6 +103,7 @@ def plot_clicktrain(bups):
     sns.despine()
     plt.tight_layout()
     plt.show()
+
 
     return None
 
