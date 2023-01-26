@@ -73,38 +73,6 @@ def make_clicktrain(total_rate=40, gamma=1.5, duration=.5, dt=.001, stereo_click
 
     return bups
 
-
-def plot_clicktrain(bups):
-    """Creates a figure containing a plot of the left and right clicks
-
-    Args:
-        bups: a dict containing left, right, left_rate, right_rate and duration
-
-    Returns:
-        None
-    """
-    left_bups = bups['left']
-    right_bups = bups['right']
-    left_rate = bups['left_rate']
-    right_rate = bups['right_rate']
-    duration = bups['duration']
-    
-    fig, ax = plt.subplots( figsize=(4,1.75))
-    ax1 = ax
-    ax1.eventplot(left_bups,lineoffsets=-.5,color=left_color, alpha=.5)
-    ax1.eventplot(right_bups,lineoffsets=.5,color=right_color, alpha=.5)
-    ax1.set_xlabel("Time (s)")
-    ax1.set_ylabel("Click sign")
-    ax1.set_title(f"Clicks $(r_L={left_rate:.2f}$ Hz, $r_R={right_rate:.2f}$ Hz)" )
-    ax1.set_xlim([0, duration])
-    ax1.set_yticks([])
-    sns.despine()
-    plt.tight_layout()
-    plt.show()
-
-
-    return None
-
 def make_adapted_clicks(bups, phi=.1, tau_phi=.2, cross_stream=True):
     """Apply adaptation process to click train and record in bups
 
@@ -170,9 +138,9 @@ def integrate_adapted_clicks(bups, lam=0, s2s=0.001, s2a=.001, s2i=.001, bias=0,
     Returns:
         None
     """
+    params = {"bias" : bias, "B" : B}
     np.random.seed(rng)
     tvec = bups['tvec']
-    fig, ax = plt.subplots(figsize=(4,2))
     dt = np.mean(np.diff(tvec))
     dur = bups['duration']
 
@@ -182,13 +150,6 @@ def integrate_adapted_clicks(bups, lam=0, s2s=0.001, s2a=.001, s2i=.001, bias=0,
     right_ts = bups['right']
     left_adapted *= np.exp(lam * (dur - left_ts))
     right_adapted *= np.exp(lam * (dur - right_ts))
-
-    ax.set_xlim([0, dur])
-    ax.axhline(bias,color='black',linestyle=':')
-    ax.axhline(B,color='black',linestyle='-',lw=1)
-    ax.axhline(-B,color='black',linestyle='-',lw=1)
-
-    alims = [-1, 1]
     a_agents = np.zeros([nagents, len(tvec)])
     for agenti in np.arange(nagents):
         left_vals = np.zeros_like(tvec)
@@ -214,80 +175,8 @@ def integrate_adapted_clicks(bups, lam=0, s2s=0.001, s2a=.001, s2i=.001, bias=0,
         if len(crossing ) > 0:
             ii = crossing[0][0]
             a[ii:] = np.ones_like(a[ii:])*np.sign(a[ii])*B
-
-        alims[0] = min(alims[0],np.min(a)*1.1)
-        alims[1] = max(alims[1],np.max(a)*1.1)
-
-        ax.plot(tvec, a, color="pink")
         a_agents[agenti, :] = a
-
-    ax.set_ylim(alims)
-
-    ax.set_xlabel("Time")
-    ax.set_ylabel("Accumulation value, a")
-    sns.despine()
-    plt.show()
-    return a_agents
-
-def plot_choices(a_agents, bias=0, lapse=0):
-    a = a_agents[:,-1]
-    nagents = len(a)
-    go_right = a > bias
-    is_lapse = np.random.random_sample(len(a)) < lapse
-    go_right[is_lapse] = np.random.random_sample(sum(is_lapse)) < .5
-    ngoright = sum(go_right)
-    nlapses = sum(is_lapse)
-
-    fig, ax = plt.subplots(figsize=(4,2))
-    ax.scatter(a[~is_lapse], go_right[~is_lapse], label= "non-lapse", alpha=.5)
-    ax.scatter(a[is_lapse], go_right[is_lapse], label = "lapse", alpha=.5)
-    xl = np.array(ax.get_xlim())
-    xl[0] = min(xl[0], bias-.5)
-    xl[1] = max(xl[1], bias+.5)
-    ax.plot([xl[0],bias], np.ones(2)*lapse/2, color="gray", label="P(go right)")
-    ax.plot([bias,xl[1]], 1-np.ones(2)*lapse/2, color="gray")
-    ax.plot([bias, bias], [lapse/2, 1-lapse/2], color="gray", linestyle="--")
-    ax.set_xlabel("Accumulation value, a")
-    ax.set_ylabel("P(go right)")
-    ax.legend(loc='upper center', ncol=3, bbox_to_anchor=(.5 ,1.5))
-    sns.despine()
-    plt.show()
-
-    #display(f'{ngoright}/{nagents} realizations chose right; {nlapses} lapse trials')
-
-def plot_adapted_clicks(bups):
-    left_bups, right_bups = bups['left'], bups['right']
-    left_adapted, right_adapted = bups['left_adapted'], bups['right_adapted']
-    tvec, Cfull = bups['tvec'], bups['Cfull']
-    Cmax = np.percentile(Cfull, 99.5)
-
-    fig, ax = plt.subplots(2, 1, figsize=(4,3), sharex=True)
-    ax0 = ax[0]
-    ax1 = ax[1]
-    ms = 4
-    alpha = .3
-    # Make adaptation value plot
-    ax0.plot(tvec, Cfull, color = "gray")
-    ax0.plot(left_bups, np.ones_like(left_bups) * Cmax, "o", color=left_color, alpha=alpha, ms=ms)
-    ax0.plot(right_bups, np.ones_like(right_bups) * Cmax, "o", color=right_color, alpha=alpha, ms=ms)
-    ax0.set_ylabel("C")
-    ax0.set_ylim([0, Cmax*1.1])
-
-    # Make click magnitude plot
-    ax1.plot(np.vstack([left_bups, left_bups]),
-             np.vstack([np.zeros_like(left_bups), -left_adapted]), color=left_color, alpha=2*alpha)
-    ax1.plot(np.vstack([right_bups, right_bups]),
-             np.vstack([np.zeros_like(right_bups), right_adapted]), color=right_color, alpha=2*alpha)
-
-    ax1.plot(left_bups,-left_adapted, "o", color=left_color, alpha=alpha, ms=ms)
-    ax1.plot(right_bups,right_adapted, "o", color=right_color, alpha=alpha, ms=ms)
-    ax1.set_xlabel("Time (s)")
-    ax1.set_title("Adapted clicks")
-    ax1.set_ylabel("Click magnitude")
-    fig.align_ylabels()
-    sns.despine()
-    plt.tight_layout()
-    plt.show()
+    return a_agents, params
 
 def compute_full_adaptation(bups, phi, tau_phi):
     tvec = bups['tvec']
@@ -313,3 +202,125 @@ def adapt_ici(phi, tau_phi, ici, C, ii, style='bing'):
             C[ii] = 1. - np.exp(arg)
         else:
             C[ii] = 1. + np.exp(arg)
+
+##########
+# Plotting code
+##########
+
+
+
+def plot_clicktrain(bups, ax=[]):
+    """Creates a figure containing a plot of the left and right clicks
+
+    Args:
+        bups: a dict containing left, right, left_rate, right_rate and duration
+
+    Returns:
+        None
+    """
+    if ax==[]:
+        fig, ax = plt.subplots( figsize=(4,1.75))
+        
+    left_bups, right_bups = bups['left'], bups['right']
+    left_rate, right_rate = bups['left_rate'], bups['right_rate']
+    duration = bups['duration']
+    
+    ax.eventplot(left_bups,lineoffsets=-.5,color=left_color, alpha=.5)
+    ax.eventplot(right_bups,lineoffsets=.5,color=right_color, alpha=.5)
+    ax.set_xlabel("Time (s)")
+    ax.set_ylabel("Click sign")
+    ax.set_title(f"Clicks $(r_L={left_rate:.2f}$ Hz, $r_R={right_rate:.2f}$ Hz)" )
+    ax.set_xlim([0, duration])
+    ax.set_yticks([-1, 1])
+    ax.set_yticklabels([r'$\delta_L$',r'$\delta_R$'])
+    return None
+
+def plot_adaptation_process(bups, ax=[]):
+    ms = 4
+    alpha = .3
+    if ax == []:
+        print('no axes supplied')
+        fig, ax = plt.subplots(figsize=(4,2))
+        
+    left_bups, right_bups = bups['left'], bups['right']
+    tvec, Cfull = bups['tvec'], bups['Cfull']
+    Cmax = np.percentile(Cfull, 99.5)
+    
+    ax.plot(tvec, Cfull, color = "gray")
+    #ax.plot(left_bups, np.ones_like(left_bups) * Cmax, "o", color=left_color, alpha=alpha, ms=ms)
+    #ax.plot(right_bups, np.ones_like(right_bups) * Cmax, "o", color=right_color, alpha=alpha, ms=ms)
+    ax.set_title("Adaptation process")
+    ax.set_xlabel("Time (s)")
+    ax.set_ylabel("C")
+    ax.set_ylim([0, Cmax*1.1])
+    
+def plot_adapted_clicks(bups, ax=[]):
+    ms = 4
+    alpha = .3
+    if ax == []:
+        fig, ax = plt.subplots(figsize=(4,2))
+        
+    left_bups, right_bups = bups['left'], bups['right']
+    left_adapted, right_adapted = bups['left_adapted'], bups['right_adapted']
+    ymax = max(np.hstack([left_adapted, right_adapted]))*1.1
+    yl = [-ymax, ymax]
+    #yl = [-1, 1]
+    ax.plot(np.vstack([left_bups, left_bups]),
+             np.vstack([np.zeros_like(left_bups), -left_adapted]), color=left_color, alpha=2*alpha)
+    ax.plot(np.vstack([right_bups, right_bups]),
+             np.vstack([np.zeros_like(right_bups), right_adapted]), color=right_color, alpha=2*alpha)
+
+    ax.plot(left_bups,-left_adapted, "o", color=left_color, alpha=alpha, ms=ms)
+    ax.plot(right_bups,right_adapted, "o", color=right_color, alpha=alpha, ms=ms)
+    ax.set_xlabel("Time (s)")
+    ax.set_title("Adapted clicks")
+    ax.set_ylabel(r"$C \cdot \delta_{R,L}$")
+    ax.set_ylim(yl)
+    ax.spines['bottom'].set_position(('data',0))
+
+    plt.tight_layout()
+
+
+def plot_accumulation(bups, a_agents, params, ax=[]):
+    tvec, dur = bups['tvec'], bups['duration']
+    bias, B = params['bias'], params['B']
+    if ax == []:
+        fig, ax = plt.subplots(figsize=(4,2))
+    alims = [-1, 1]
+    ax.set_xlim([0, dur])
+    ax.axhline(bias,color='black',linestyle=':')
+    ax.axhline(B,color='black',linestyle='-',lw=1)
+    ax.axhline(-B,color='black',linestyle='-',lw=1)
+    for a in a_agents:
+        ax.plot(tvec, a, color="pink")
+        alims[0] = min(alims[0],np.min(a)*1.1)
+        alims[1] = max(alims[1],np.max(a)*1.1)
+    ax.set_ylim(alims)
+    ax.set_xlabel("Time (s)")
+    ax.set_title("Accumulation process")
+    ax.set_ylabel("a")
+    sns.despine()
+
+def plot_choices(a_agents, bias=0, lapse=0):
+    a = a_agents[:,-1]
+    nagents = len(a)
+    go_right = a > bias
+    is_lapse = np.random.random_sample(len(a)) < lapse
+    go_right[is_lapse] = np.random.random_sample(sum(is_lapse)) < .5
+    ngoright = sum(go_right)
+    nlapses = sum(is_lapse)
+
+    fig, ax = plt.subplots(figsize=(4,2))
+    ax.scatter(a[~is_lapse], go_right[~is_lapse], label= "non-lapse", alpha=.5)
+    ax.scatter(a[is_lapse], go_right[is_lapse], label = "lapse", alpha=.5)
+    xl = np.array(ax.get_xlim())
+    xl[0] = min(xl[0], bias-.5)
+    xl[1] = max(xl[1], bias+.5)
+    ax.plot([xl[0],bias], np.ones(2)*lapse/2, color="gray", label="P(go right)")
+    ax.plot([bias,xl[1]], 1-np.ones(2)*lapse/2, color="gray")
+    ax.plot([bias, bias], [lapse/2, 1-lapse/2], color="gray", linestyle="--")
+    ax.set_xlabel("Accumulation value, a")
+    ax.set_ylabel("P(go right)")
+    ax.legend(loc='upper center', ncol=3, bbox_to_anchor=(.5 ,1.5))
+    #display(f'{ngoright}/{nagents} realizations chose right; {nlapses} lapse trials')
+    
