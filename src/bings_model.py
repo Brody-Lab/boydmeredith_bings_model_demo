@@ -207,6 +207,36 @@ def adapt_ici(phi, tau_phi, ici, C, ii, style='bing'):
 # Plotting code
 ##########
 
+def plot_process(bups, a, params):
+    fig, ax = plt.subplots(4,1, sharex=True, 
+                           figsize=(6,7),
+                           gridspec_kw={'height_ratios': [.2, .2, .45, 1]})
+    
+    bm.plot_clicktrain(bups, ax=ax[0])
+    ax[0].set_ylabel('')
+    ax[0].spines[['left','bottom']].set_linewidth(0)
+    ax[0].axes.get_xaxis().set_visible(False)
+    ax[0].tick_params(left=False)
+        
+    bm.plot_adaptation_process(bups, ax=ax[1])
+    ax[1].set_xlabel('')
+    ax[1].axes.get_xaxis().set_visible(False)
+    ax[1].spines[['left']].set_linewidth(0)
+    
+    bm.plot_adapted_clicks(bups, ax=ax[2])
+    ax[2].axes.get_xaxis().set_visible(False)
+    ax[2].spines[['bottom']].set_visible(False)
+    ax[2].spines[['left']].set_linewidth(0)
+    ax[2].spines[['bottom']].set_linewidth(.5)
+
+    
+    bm.plot_accumulation(bups, a, params, ax=ax[3])
+    
+    fig.tight_layout()
+    ax[0].set_xlim([-.025, bups['duration']+.025])
+    #fig.align_ylabels()
+    plt.show()
+    return None
 
 
 def plot_clicktrain(bups, ax=[]):
