@@ -68,8 +68,6 @@ def make_clicktrain(total_rate=40, gamma=1.5, duration=.5, dt=.001, stereo_click
         'right_ind':right_ind, 'left_ind':left_ind, 'duration':duration,
            'left_rate':left_rate, 'right_rate':right_rate}
 
-    plot_clicktrain(bups)
-
     return bups
 
 
@@ -88,18 +86,15 @@ def plot_clicktrain(bups):
     right_rate = bups['right_rate']
     duration = bups['duration']
     
-    fig, ax = plt.subplots( figsize=(4,3.5))
+    fig, ax = plt.subplots( figsize=(4,1.75))
     ax1 = ax
-    #ax1.set_position([.2, .2, .8, .8])
     ax1.eventplot(left_bups,lineoffsets=-.5,color="blue", alpha=.5)
     ax1.eventplot(right_bups,lineoffsets=.5,color="red", alpha=.5)
-    ax1.plot(left_bups,-np.ones_like(left_bups), "o", color="blue", alpha=.5, label=f"r_L={left_rate:.2f} Hz")
-    ax1.plot(right_bups,np.ones_like(right_bups), "o", color="red", alpha=.5, label=f"r_R={right_rate:.2f} Hz")
     ax1.set_xlabel("Time (s)")
     ax1.set_ylabel("Click sign")
-    ax1.set_title("Clicks")
-    ax1.legend(loc="upper center", ncol=2, bbox_to_anchor=(.5 ,1.75))
+    ax1.set_title(f"Clicks $(r_L={left_rate:.2f}$ Hz, $r_R={right_rate:.2f}$ Hz)" )
     ax1.set_xlim([0, duration])
+    ax1.set_yticks([])
     sns.despine()
     plt.tight_layout()
     plt.show()
@@ -152,9 +147,8 @@ def make_adapted_clicks(bups, phi=.1, tau_phi=.2, cross_stream=True):
 
     # compute the full adaptation process
     tvec, Cfull = compute_full_adaptation(bups, phi, tau_phi)
-
-    plot_adapted_clicks(bups, tvec, Cfull)
-
+    bups['Cfull'] = Cfull
+    bups['tvec'] = tvec
     return None
 
 def integrate_adapted_clicks(bups, lam=0, s2s=0.001, s2a=.001, s2i=.001, bias=0, B=5., nagents=5, rng=1):
@@ -258,9 +252,10 @@ def plot_choices(a_agents, bias=0, lapse=0):
 
     #display(f'{ngoright}/{nagents} realizations chose right; {nlapses} lapse trials')
 
-def plot_adapted_clicks(bups, tvec, Cfull):
+def plot_adapted_clicks(bups):
     left_bups, right_bups = bups['left'], bups['right']
     left_adapted, right_adapted = bups['left_adapted'], bups['right_adapted']
+    tvec, Cfull = bups['tvec'], bups['Cfull']
     fig, ax = plt.subplots(2, 1, figsize=(4,3), sharex=True)
     ax0 = ax[0]
     ax1 = ax[1]
