@@ -16,6 +16,9 @@ import scipy as sp
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+left_color = "purple"
+right_color = "green"
+
 
 def rate_from_gamma(gamma, total_rate=40):
     """Computes click rates based on gamma and total click rate
@@ -88,8 +91,8 @@ def plot_clicktrain(bups):
     
     fig, ax = plt.subplots( figsize=(4,1.75))
     ax1 = ax
-    ax1.eventplot(left_bups,lineoffsets=-.5,color="blue", alpha=.5)
-    ax1.eventplot(right_bups,lineoffsets=.5,color="red", alpha=.5)
+    ax1.eventplot(left_bups,lineoffsets=-.5,color=left_color, alpha=.5)
+    ax1.eventplot(right_bups,lineoffsets=.5,color=right_color, alpha=.5)
     ax1.set_xlabel("Time (s)")
     ax1.set_ylabel("Click sign")
     ax1.set_title(f"Clicks $(r_L={left_rate:.2f}$ Hz, $r_R={right_rate:.2f}$ Hz)" )
@@ -256,21 +259,28 @@ def plot_adapted_clicks(bups):
     left_bups, right_bups = bups['left'], bups['right']
     left_adapted, right_adapted = bups['left_adapted'], bups['right_adapted']
     tvec, Cfull = bups['tvec'], bups['Cfull']
+    Cmax = np.percentile(Cfull, 99.5)
+
     fig, ax = plt.subplots(2, 1, figsize=(4,3), sharex=True)
     ax0 = ax[0]
     ax1 = ax[1]
+    ms = 4
+    alpha = .3
+    # Make adaptation value plot
     ax0.plot(tvec, Cfull, color = "gray")
-    ax0.plot(left_bups, left_adapted, "o", color="blue", alpha=.5)
-    ax0.plot(right_bups, right_adapted, "o", color="red", alpha=.5)
-    ax0.set_ylabel("Adaptation value, C")
+    ax0.plot(left_bups, np.ones_like(left_bups) * Cmax, "o", color=left_color, alpha=alpha, ms=ms)
+    ax0.plot(right_bups, np.ones_like(right_bups) * Cmax, "o", color=right_color, alpha=alpha, ms=ms)
+    ax0.set_ylabel("C")
+    ax0.set_ylim([0, Cmax*1.1])
 
+    # Make click magnitude plot
     ax1.plot(np.vstack([left_bups, left_bups]),
-             np.vstack([np.zeros_like(left_bups), -left_adapted]), color="blue", alpha=.5)
+             np.vstack([np.zeros_like(left_bups), -left_adapted]), color=left_color, alpha=2*alpha)
     ax1.plot(np.vstack([right_bups, right_bups]),
-             np.vstack([np.zeros_like(right_bups), right_adapted]), color="red", alpha=.5)
+             np.vstack([np.zeros_like(right_bups), right_adapted]), color=right_color, alpha=2*alpha)
 
-    ax1.plot(left_bups,-left_adapted, "o", color="blue", alpha=.5)
-    ax1.plot(right_bups,right_adapted, "o", color="red", alpha=.5)
+    ax1.plot(left_bups,-left_adapted, "o", color=left_color, alpha=alpha, ms=ms)
+    ax1.plot(right_bups,right_adapted, "o", color=right_color, alpha=alpha, ms=ms)
     ax1.set_xlabel("Time (s)")
     ax1.set_title("Adapted clicks")
     ax1.set_ylabel("Click magnitude")
