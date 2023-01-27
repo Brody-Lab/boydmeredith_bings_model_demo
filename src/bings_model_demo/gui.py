@@ -4,7 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-import bings_model_demo.bings_model as bm
+import bings_model_demo.model as bm
+import bings_model_demo.plots as dp
 
 sns.set_context('notebook')
 
@@ -28,7 +29,7 @@ def integration_eventhandler(change):
 def choice_eventhandler(change):
     plot_out.clear_output(wait=True)    
     with plot_out:
-        bm.plot_process(bups, a, params)
+        dp.plot_process(bups, a, params)
         
 plot_out = widgets.Output()
 
