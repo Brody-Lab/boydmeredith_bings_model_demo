@@ -27,6 +27,16 @@ Let's put a widget here for fun
     b = Button(icon='legal')
     jsdlink((s1, 'value'), (s2, 'max'))
     VBox([s1, s2, b])
+    
+Let's try the model ui
+
+.. jupyter-execute:: 
+
+    import os
+    import sys
+    print(sys.path)
+    sys.path.insert(0, os.path.relpath('..'))
+    import src.model_ui
 
 Indices and tables
 ==================
