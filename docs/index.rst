@@ -13,16 +13,21 @@ Check out the :doc:`usage` section for further information, including how to :re
 Contents 
 --------
 .. toctree::
-    :maxdepth: 2
 
     usage
     source/modules
     ../Bings Model Demo
 
-    
 Let's put a widget here for fun
 
-   
+.. jupyter-execute::
+
+    from ipywidgets import VBox, jsdlink, IntSlider, Button
+    s1, s2 = IntSlider(max=200, value=100), IntSlider(value=40)
+    b = Button(icon='legal')
+    jsdlink((s1, 'value'), (s2, 'max'))
+    VBox([s1, s2, b])
+
 Indices and tables
 ==================
 
