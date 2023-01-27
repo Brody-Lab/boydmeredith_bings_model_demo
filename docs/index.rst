@@ -9,20 +9,23 @@ Bing's Model Demo documentation!
 **Bing's Model Demo** creates an interactive jupyter notebook designed to help build intuition about Bing's model, an elaboration of the drift diffusion model.
 Check out the :doc:`usage` section for further information, including how to :ref:`install <installation>` the project
 
+
 Contents 
 --------
 .. toctree::
+    :maxdepth: 2
 
     usage
     source/modules
+    Bings Model Demo
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents
     
+Let's put a widget here for fun
 
+.. jupyter-execute::
 
-
+    print('test'+'test2')
+   
 Indices and tables
 ==================
 
