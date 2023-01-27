@@ -22,11 +22,20 @@ Let's put a widget here for fun
 
 .. jupyter-execute::
 
-    from ipywidgets import VBox, jsdlink, IntSlider, Button
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from ipywidgets import widgets, VBox, jsdlink, IntSlider, Button
     s1, s2 = IntSlider(max=200, value=100), IntSlider(value=40)
     b = Button(icon='legal')
     jsdlink((s1, 'value'), (s2, 'max'))
-    VBox([s1, s2, b])
+    out = widgets.Output()
+    def eventhandler(change):
+        out.clear_output()
+        with out:
+            plt.plot(np.arange(5),change.new*np.arange(5))
+            plt.show()
+   s1.observe(eventhandler, names='value')
+   display(widgets.HBox([s1, out]))
     
 Let's try the model ui
 
