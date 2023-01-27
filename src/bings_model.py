@@ -208,6 +208,24 @@ def adapt_ici(phi, tau_phi, ici, C, ii, style='bing'):
 ##########
 
 def plot_process(bups, a, params):
+    """
+    Create a figure summarizing accumulation process
+
+    Draw four panels.
+    1. The left and right click events
+    2. The sensory adaptation process that determines each click's impact on the accumulator value (before sensory noise is applied)
+    3. The magnitide of each click after sensory adaptation 
+    4. Realizations the accumulation process
+
+    Args:
+        bups: A dictionary containing information about the click train and adaptation process
+        a: An N X T numpy array containing N realizations at T timepoint 
+        params: The agent's accumulation parameters
+    
+    Returns:
+        fig: A figure containing each of the subplots 
+
+    """
     fig, ax = plt.subplots(4,1, sharex=True, 
                            figsize=(6,7),
                            gridspec_kw={'height_ratios': [.2, .2, .45, 1]})
@@ -236,7 +254,7 @@ def plot_process(bups, a, params):
     ax[0].set_xlim([-.025, bups['duration']+.025])
     #fig.align_ylabels()
     plt.show()
-    return None
+    return fig
 
 
 def plot_clicktrain(bups, ax=[]):
