@@ -38,8 +38,6 @@ Let's try the model ui
     sys.path.insert(0, os.path.relpath('..'))
     import src.model_ui
 
-Indices and tables
-==================
 
 * :ref:`genindex`
 * :ref:`modindex`

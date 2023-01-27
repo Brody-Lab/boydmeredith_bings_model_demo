@@ -12,7 +12,8 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.relpath('..'))
+sys.path.insert(0, os.path.abspath('/Users/tyler/projects/bings_model_demo'))
+import src
 
 # -- Project information -----------------------------------------------------
 
