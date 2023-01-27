@@ -2,6 +2,7 @@ name: bings_model_demo
 channels:
   - defaults
 dependencies:
+  - alabaster=0.7.12=pyhd3eb1b0_0
   - anyio=3.5.0=py38hca03da5_0
   - appnope=0.1.2=py38hca03da5_1001
   - argon2-cffi=21.3.0=pyhd3eb1b0_0
@@ -14,19 +15,28 @@ dependencies:
   - blas=1.0=openblas
   - bleach=4.1.0=pyhd3eb1b0_0
   - bottleneck=1.3.5=py38heec5a64_0
+  - brotli=1.0.9=h1a28f6b_7
+  - brotli-bin=1.0.9=h1a28f6b_7
   - brotlipy=0.7.0=py38h1a28f6b_1002
   - ca-certificates=2023.01.10=hca03da5_0
   - certifi=2022.12.7=py38hca03da5_0
   - cffi=1.15.1=py38h80987f9_3
   - charset-normalizer=2.0.4=pyhd3eb1b0_0
+  - colorama=0.4.6=py38hca03da5_0
   - comm=0.1.2=py38hca03da5_0
+  - contourpy=1.0.5=py38h525c30c_0
   - cryptography=38.0.4=py38h834c97f_0
+  - cycler=0.11.0=pyhd3eb1b0_0
   - debugpy=1.5.1=py38hc377ac9_0
   - decorator=5.1.1=pyhd3eb1b0_0
   - defusedxml=0.7.1=pyhd3eb1b0_0
+  - docutils=0.18.1=py38hca03da5_3
   - entrypoints=0.4=py38hca03da5_0
   - executing=0.8.3=pyhd3eb1b0_0
+  - fftw=3.3.9=h1a28f6b_1
   - flit-core=3.6.0=pyhd3eb1b0_0
+  - fonttools=4.25.0=pyhd3eb1b0_0
+  - freetype=2.12.1=h1192e45_0
   - gettext=0.21.0=h826f4ad_0
   - giflib=5.2.1=h80987f9_1
   - glib=2.69.1=h514c7bf_2
@@ -34,6 +44,7 @@ dependencies:
   - gstreamer=1.14.1=he09cfb7_0
   - icu=68.1=hc377ac9_0
   - idna=3.4=py38hca03da5_0
+  - imagesize=1.4.1=py38hca03da5_0
   - importlib-metadata=4.11.3=py38hca03da5_0
   - importlib_resources=5.2.0=pyhd3eb1b0_1
   - ipykernel=6.19.2=py38h86d0a89_0
@@ -54,8 +65,13 @@ dependencies:
   - jupyterlab_pygments=0.1.2=py_0
   - jupyterlab_server=2.16.5=py38hca03da5_0
   - jupyterlab_widgets=1.0.0=pyhd3eb1b0_1
+  - kiwisolver=1.4.4=py38h313beb8_0
   - krb5=1.19.4=h8380606_0
+  - lcms2=2.12=hba8e193_0
   - lerc=3.0=hc377ac9_0
+  - libbrotlicommon=1.0.9=h1a28f6b_7
+  - libbrotlidec=1.0.9=h1a28f6b_7
+  - libbrotlienc=1.0.9=h1a28f6b_7
   - libclang=12.0.0=default_hc321e17_4
   - libcxx=14.0.6=h848a8c0_0
   - libdeflate=1.8=h1a28f6b_5
@@ -78,8 +94,11 @@ dependencies:
   - lxml=4.9.1=py38h2fae87d_0
   - lz4-c=1.9.4=h313beb8_0
   - markupsafe=2.1.1=py38h1a28f6b_0
+  - matplotlib=3.6.2=py38hca03da5_0
+  - matplotlib-base=3.6.2=py38h8bbb115_0
   - matplotlib-inline=0.1.6=py38hca03da5_0
   - mistune=0.8.4=py38h1a28f6b_1000
+  - munkres=1.1.4=py_0
   - nbclassic=0.4.8=py38hca03da5_0
   - nbclient=0.5.13=py38hca03da5_0
   - nbconvert=6.5.4=py38hca03da5_0
@@ -101,6 +120,7 @@ dependencies:
   - pcre=8.45=hc377ac9_0
   - pexpect=4.8.0=pyhd3eb1b0_3
   - pickleshare=0.7.5=pyhd3eb1b0_1003
+  - pillow=9.3.0=py38hf4a492f_1
   - pip=22.3.1=py38hca03da5_0
   - pkgutil-resolve-name=1.3.10=py38hca03da5_0
   - platformdirs=2.5.2=py38hca03da5_0
@@ -114,6 +134,7 @@ dependencies:
   - pycparser=2.21=pyhd3eb1b0_0
   - pygments=2.11.2=pyhd3eb1b0_0
   - pyopenssl=22.0.0=pyhd3eb1b0_0
+  - pyparsing=3.0.9=py38hca03da5_0
   - pyqt=5.15.7=py38hc377ac9_0
   - pyqt5-sip=12.11.0=py38hc377ac9_0
   - pyrsistent=0.18.0=py38h1a28f6b_0
@@ -130,12 +151,22 @@ dependencies:
   - qtwebkit=5.212=h0f11f3c_4
   - readline=8.2=h1a28f6b_0
   - requests=2.28.1=py38hca03da5_0
+  - scipy=1.9.3=py38h9d039d2_0
+  - seaborn=0.12.2=py38hca03da5_0
   - send2trash=1.8.0=pyhd3eb1b0_1
   - setuptools=65.6.3=py38hca03da5_0
   - sip=6.6.2=py38hc377ac9_0
   - six=1.16.0=pyhd3eb1b0_1
   - sniffio=1.2.0=py38hca03da5_1
+  - snowballstemmer=2.2.0=pyhd3eb1b0_0
   - soupsieve=2.3.2.post1=py38hca03da5_0
+  - sphinx=5.0.2=py38hca03da5_0
+  - sphinxcontrib-applehelp=1.0.2=pyhd3eb1b0_0
+  - sphinxcontrib-devhelp=1.0.2=pyhd3eb1b0_0
+  - sphinxcontrib-htmlhelp=2.0.0=pyhd3eb1b0_0
+  - sphinxcontrib-jsmath=1.0.1=pyhd3eb1b0_0
+  - sphinxcontrib-qthelp=1.0.3=pyhd3eb1b0_0
+  - sphinxcontrib-serializinghtml=1.1.5=pyhd3eb1b0_0
   - sqlite=3.40.1=h7a7dc30_0
   - stack_data=0.2.0=pyhd3eb1b0_0
   - terminado=0.17.1=py38hca03da5_0
@@ -158,4 +189,13 @@ dependencies:
   - zipp=3.11.0=py38hca03da5_0
   - zlib=1.2.13=h5a0b063_0
   - zstd=1.5.2=h8574219_0
+  - pip:
+      - furo==2022.12.7
+      - jupyter-sphinx==0.4.0
+      - markdown-it-py==2.1.0
+      - mdit-py-plugins==0.3.3
+      - mdurl==0.1.2
+      - myst-parser==0.18.1
+      - pyyaml==6.0
+      - sphinx-basic-ng==1.0.0b1
 prefix: /Users/tyler/miniconda3/envs/bings_model_demo
