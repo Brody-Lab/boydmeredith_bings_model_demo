@@ -45,7 +45,7 @@ Let's try the model ui
     import sys
     print(sys.path)
     sys.path.insert(0, os.path.relpath('..'))
-    import src.model_ui
+    import bings_model_demo.gui
 
 
 * :ref:`genindex`
