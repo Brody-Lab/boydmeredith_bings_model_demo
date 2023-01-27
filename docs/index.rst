@@ -17,14 +17,11 @@ Contents
 
     usage
     source/modules
-    Bings Model Demo
+    ../Bings Model Demo
 
     
 Let's put a widget here for fun
 
-.. jupyter-execute::
-
-    print('test'+'test2')
    
 Indices and tables
 ==================
