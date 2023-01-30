@@ -12,7 +12,7 @@ sns.set_context('notebook')
 def clicks_eventhandler(change):
     global bups
     bups = bm.make_clicktrain(total_rate=rate_slider.value, gamma=gamma_slider.value,
-                               duration=dur_slider.value, rng=seed_slider.value)
+                               duration=dur_slider.value, rng=seed_slider.value, stereo_click=stereo_check.value)
     adaptation_eventhandler(change)
 
 def adaptation_eventhandler(change):
@@ -53,12 +53,14 @@ with choice_text:
     print("\nChoice parameters\n")
 
 # Define click parameters
+stereo_check = widgets.Checkbox(value=True, description="Stereo Click")
 seed_slider = widgets.IntSlider(value=1, min=0, max=10, description="Seed")
 rate_slider = widgets.IntSlider(value=40,min=5,max=50,step=5,description=r'$r_L+r_R$ (Hz)')
 gamma_slider = widgets.FloatSlider(value=1.5,min=-5,max=5,step=.25,description=r"$\gamma = \log \frac{r_1}{r_2}$")
 dur_slider = widgets.FloatSlider(value=1,min=.25,max=5,step=.25,description="T (s)")
 
 seed_slider.observe(clicks_eventhandler, names='value')
+stereo_check.observe(clicks_eventhandler, names='value')
 rate_slider.observe(clicks_eventhandler, names='value')
 gamma_slider.observe(clicks_eventhandler, names='value')
 dur_slider.observe(clicks_eventhandler, names='value')
@@ -91,12 +93,12 @@ lapse_slider = widgets.FloatSlider(value=.05, min = 0., max=1., step=.01, descri
 bias_slider.observe(clicks_eventhandler, names='value')
 lapse_slider.observe(clicks_eventhandler, names='value')
 
-bup_inputs = widgets.VBox([bups_text, seed_slider, rate_slider, gamma_slider, dur_slider])
+bup_inputs = widgets.VBox([bups_text, stereo_check, rate_slider, gamma_slider, dur_slider])
 adaptation_inputs = widgets.VBox([adaptation_text, phi_slider, tau_phi_slider])
 integration_inputs = widgets.VBox([integration_text, lambda_slider, s2s_slider, s2a_slider,
                                    s2i_slider, B_slider, nagent_slider])
 choice_inputs = widgets.VBox([choice_text, bias_slider, lapse_slider])
-inputs = widgets.VBox([bup_inputs, adaptation_inputs, integration_inputs, choice_inputs])
+inputs = widgets.VBox([seed_slider, bup_inputs, adaptation_inputs, integration_inputs, choice_inputs])
 
 interface = widgets.HBox([inputs, plot_out])
 
