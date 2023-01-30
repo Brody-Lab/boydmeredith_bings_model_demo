@@ -101,5 +101,6 @@ inputs = widgets.VBox([bup_inputs, adaptation_inputs, integration_inputs, choice
 interface = widgets.HBox([inputs, plot_out])
 
 def draw_gui():
+    """Create the gui showing how a trail from the Poisson Clicks task is integrated by Bings model to produce a choice"""
     display(interface)
     clicks_eventhandler([])
