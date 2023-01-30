@@ -17,43 +17,43 @@ def plot_process(bups, a, params):
     Draw four panels.
     1. The left and right click events
     2. The sensory adaptation process that determines each click's impact on the accumulator value (before sensory noise is applied)
-    3. The magnitide of each click after sensory adaptation 
+    3. The magnitide of each click after sensory adaptation
     4. Realizations the accumulation process
 
     Args:
         bups: A dictionary containing information about the click train and adaptation process
-        a: An N X T numpy array containing N realizations at T timepoint 
+        a: An N X T numpy array containing N realizations at T timepoint
         params: The agent's accumulation parameters
-    
+
     Returns:
-        fig: A figure containing each of the subplots 
+        fig: A figure containing each of the subplots
 
     """
-    fig, ax = plt.subplots(4,1, sharex=True, 
+    fig, ax = plt.subplots(4,1, sharex=True,
                            figsize=(6,7),
                            gridspec_kw={'height_ratios': [.2, .2, .45, 1]})
-    
+
     plot_clicktrain(bups, ax=ax[0])
     ax[0].set_ylabel('')
     for spine in ['left','bottom']:
         ax[0].spines[spine].set_linewidth(1)
     ax[0].axes.get_xaxis().set_visible(False)
     ax[0].tick_params(left=False)
-        
+
     plot_adaptation_process(bups, ax=ax[1])
     ax[1].set_xlabel('')
     ax[1].axes.get_xaxis().set_visible(False)
     ax[1].spines['left'].set_linewidth(0)
-    
+
     plot_adapted_clicks(bups, ax=ax[2])
     ax[2].axes.get_xaxis().set_visible(False)
     ax[2].spines['bottom'].set_visible(False)
     ax[2].spines['left'].set_linewidth(0)
     ax[2].spines['bottom'].set_linewidth(.5)
 
-    
+
     plot_accumulation(bups, a, params, ax=ax[3])
-    
+
     fig.tight_layout()
     ax[0].set_xlim([-.025, bups['duration']+.025])
     #fig.align_ylabels()
@@ -72,11 +72,11 @@ def plot_clicktrain(bups, ax=[]):
     """
     if ax==[]:
         fig, ax = plt.subplots( figsize=(4,1.75))
-        
+
     left_bups, right_bups = bups['left'], bups['right']
     left_rate, right_rate = bups['left_rate'], bups['right_rate']
     duration = bups['duration']
-    
+
     ax.eventplot(left_bups,lineoffsets=-.5,color=left_color, alpha=.5)
     ax.eventplot(right_bups,lineoffsets=.5,color=right_color, alpha=.5)
     ax.set_xlabel("Time (s)")
@@ -85,6 +85,9 @@ def plot_clicktrain(bups, ax=[]):
     ax.set_xlim([0, duration])
     ax.set_yticks([-1, 1])
     ax.set_yticklabels([r'$\delta_L$',r'$\delta_R$'])
+    for spine in ['left','right','top']:
+        ax.spines[spine].set_linewidth(0)
+
     return None
 
 def plot_adaptation_process(bups, ax=[]):
@@ -93,11 +96,11 @@ def plot_adaptation_process(bups, ax=[]):
     if ax == []:
         print('no axes supplied')
         fig, ax = plt.subplots(figsize=(4,2))
-        
+
     left_bups, right_bups = bups['left'], bups['right']
     tvec, Cfull = bups['tvec'], bups['Cfull']
     Cmax = np.percentile(Cfull, 99.5)
-    
+
     ax.plot(tvec, Cfull, color = "gray")
     #ax.plot(left_bups, np.ones_like(left_bups) * Cmax, "o", color=left_color, alpha=alpha, ms=ms)
     #ax.plot(right_bups, np.ones_like(right_bups) * Cmax, "o", color=right_color, alpha=alpha, ms=ms)
@@ -105,13 +108,13 @@ def plot_adaptation_process(bups, ax=[]):
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("C")
     ax.set_ylim([0, Cmax*1.1])
-    
+
 def plot_adapted_clicks(bups, ax=[]):
     ms = 4
     alpha = .3
     if ax == []:
         fig, ax = plt.subplots(figsize=(4,2))
-        
+
     left_bups, right_bups = bups['left'], bups['right']
     left_adapted, right_adapted = bups['left_adapted'], bups['right_adapted']
     ymax = max(np.hstack([left_adapted, right_adapted]))*1.1
@@ -175,4 +178,3 @@ def plot_choices(a_agents, bias=0, lapse=0):
     ax.set_ylabel("P(go right)")
     ax.legend(loc='upper center', ncol=3, bbox_to_anchor=(.5 ,1.5))
     #display(f'{ngoright}/{nagents} realizations chose right; {nlapses} lapse trials')
-    
