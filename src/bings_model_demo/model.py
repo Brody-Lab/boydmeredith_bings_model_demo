@@ -96,17 +96,7 @@ def make_adapted_clicks(bups, phi=.1, tau_phi=.2, cross_stream=True):
     sort_order = np.argsort(bups_cat)
     bups_cat = bups_cat[sort_order]
     sign_cat = sign_cat[sort_order]
-    ici = np.diff(bups_cat)
-
-    C  = np.ones_like(bups_cat)
-    cross_side_suppression = 0
-    for ii in np.arange(1,len(C)):
-        if ici[ii-1] <= cross_side_suppression and phi != 1:
-            C[ii-1] = 0
-            C[ii] = 0
-            continue
-        if abs(phi-1) > 1e-5:
-            adapt_ici(phi, tau_phi, ici, C, ii, style='bing')
+    C = adapt_clicks(phi, tau_phi, bups_cat)
 
     left_adapted = C[sign_cat==-1]
     right_adapted = C[sign_cat==1]
@@ -118,6 +108,19 @@ def make_adapted_clicks(bups, phi=.1, tau_phi=.2, cross_stream=True):
     bups['Cfull'] = Cfull
     bups['tvec'] = tvec
     return None
+
+def adapt_clicks(phi, tau_phi, bups_cat):
+    ici = np.diff(bups_cat)
+    C  = np.ones_like(bups_cat)
+    cross_side_suppression = 0
+    for ii in np.arange(1,len(C)):
+        if ici[ii-1] <= cross_side_suppression and phi != 1:
+            C[ii-1] = 0
+            C[ii] = 0
+            continue
+        if abs(phi-1) > 1e-5:
+            adapt_ici(phi, tau_phi, ici, C, ii, style='bing')
+    return C
 
 def integrate_adapted_clicks(bups, lam=0, s2s=0.001, s2a=.001, s2i=.001, bias=0, B=5., nagents=5, rng=1):
     """Apply integration process to adapted click train in bups
