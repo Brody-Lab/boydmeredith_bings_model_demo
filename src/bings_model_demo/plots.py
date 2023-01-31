@@ -9,6 +9,7 @@ import seaborn as sns
 ##########
 left_color = "purple"
 right_color = "green"
+model_color = "pink"
 
 def plot_process(bups, a, params):
     """
@@ -30,7 +31,7 @@ def plot_process(bups, a, params):
 
     """
     fig, ax = plt.subplots(4,1, sharex=True,
-                           figsize=(6,7),
+                           figsize=(5,7),
                            gridspec_kw={'height_ratios': [.2, .2, .45, 1]})
 
     plot_clicktrain(bups, ax=ax[0])
@@ -39,6 +40,7 @@ def plot_process(bups, a, params):
         ax[0].spines[spine].set_linewidth(1)
     ax[0].axes.get_xaxis().set_visible(False)
     ax[0].tick_params(left=False)
+    ax[0].set_xlim([-.025, bups['duration']+.025])
 
     plot_adaptation_process(bups, ax=ax[1])
     ax[1].set_xlabel('')
@@ -51,13 +53,28 @@ def plot_process(bups, a, params):
     ax[2].spines['left'].set_linewidth(0)
     ax[2].spines['bottom'].set_linewidth(.5)
 
-
     plot_accumulation(bups, a, params, ax=ax[3])
-
     fig.tight_layout()
-    ax[0].set_xlim([-.025, bups['duration']+.025])
+
+    ax3pos = ax[3].get_position()
+    choice_axpos = [ax3pos.x0 + ax3pos.width + .075 , ax3pos.y0, .1, ax3pos.height]
+    choice_ax = fig.add_axes(choice_axpos)
+    final_a = a[:,-1]
+    B = params["B"]
+    sns.kdeplot(y = final_a, warn_singular=False, color=model_color, ax=choice_ax, clip=[-B, B], fill=True)
+    choice_ax.axhline(params['bias'],ls=":", color="black")
+    choice_ax.axhline(params['B'],ls="-", color="black")
+    choice_ax.axhline(-params['B'],ls="-", color="black")
+    choice_ax.set_ylim(ax[3].get_ylim())
+    choice_ax.axes.get_yaxis().set_visible(False)
+    choice_ax.set_title("Final $a$")
+    choice_ax.set_xlabel("$P(a)$")
+    sns.despine()
+
+    #plot_choices(a, bias=params['bias'], lapse=params['lapse'], ax=choice_ax)
+
     #fig.align_ylabels()
-    plt.show()
+    #plt.show()
     return fig
 
 
@@ -99,7 +116,7 @@ def plot_adaptation_process(bups, ax=[]):
 
     left_bups, right_bups = bups['left'], bups['right']
     tvec, Cfull = bups['tvec'], bups['Cfull']
-    Cmax = np.percentile(Cfull, 99.5)
+    Cmax = max(np.hstack([bups['left_adapted'], bups['right_adapted']]))
 
     ax.plot(tvec, Cfull, color = "gray")
     #ax.plot(left_bups, np.ones_like(left_bups) * Cmax, "o", color=left_color, alpha=alpha, ms=ms)
@@ -107,7 +124,7 @@ def plot_adaptation_process(bups, ax=[]):
     ax.set_title("Adaptation process")
     ax.set_xlabel("Time (s)")
     ax.set_ylabel("C")
-    ax.set_ylim([0, Cmax*1.1])
+    ax.set_ylim([0, Cmax*1.2])
 
 def plot_adapted_clicks(bups, ax=[]):
     ms = 4
@@ -139,6 +156,8 @@ def plot_adapted_clicks(bups, ax=[]):
 def plot_accumulation(bups, a_agents, params, ax=[]):
     tvec, dur = bups['tvec'], bups['duration']
     bias, B = params['bias'], params['B']
+    n_agents = np.shape(a_agents)[0]
+    alpha = 1 / (n_agents ** .25)
     if ax == []:
         fig, ax = plt.subplots(figsize=(4,2))
     alims = [-1, 1]
@@ -147,7 +166,7 @@ def plot_accumulation(bups, a_agents, params, ax=[]):
     ax.axhline(B,color='black',linestyle='-',lw=1)
     ax.axhline(-B,color='black',linestyle='-',lw=1)
     for a in a_agents:
-        ax.plot(tvec, a, color="pink")
+        ax.plot(tvec, a, color=model_color, alpha=alpha)
         alims[0] = min(alims[0],np.min(a)*1.1)
         alims[1] = max(alims[1],np.max(a)*1.1)
     ax.set_ylim(alims)
@@ -156,7 +175,9 @@ def plot_accumulation(bups, a_agents, params, ax=[]):
     ax.set_ylabel("a")
     sns.despine()
 
-def plot_choices(a_agents, bias=0, lapse=0):
+def plot_choices(a_agents, bias=0, lapse=0, ax=[]):
+    if ax == []:
+        fig, ax = plt.subplots(figsize=(4,2))
     a = a_agents[:,-1]
     nagents = len(a)
     go_right = a > bias
@@ -165,7 +186,6 @@ def plot_choices(a_agents, bias=0, lapse=0):
     ngoright = sum(go_right)
     nlapses = sum(is_lapse)
 
-    fig, ax = plt.subplots(figsize=(4,2))
     ax.scatter(a[~is_lapse], go_right[~is_lapse], label= "non-lapse", alpha=.5)
     ax.scatter(a[is_lapse], go_right[is_lapse], label = "lapse", alpha=.5)
     xl = np.array(ax.get_xlim())
@@ -177,4 +197,4 @@ def plot_choices(a_agents, bias=0, lapse=0):
     ax.set_xlabel("Accumulation value, a")
     ax.set_ylabel("P(go right)")
     ax.legend(loc='upper center', ncol=3, bbox_to_anchor=(.5 ,1.5))
-    #display(f'{ngoright}/{nagents} realizations chose right; {nlapses} lapse trials')
+    ax.set_title(f'{ngoright}/{nagents} realizations chose right; {nlapses} lapse trials')

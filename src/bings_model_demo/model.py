@@ -144,9 +144,10 @@ def adapt_ici(phi, tau_phi, ici, C, ii, style='brian'):
     else:
         C[ii] = 1. + np.exp(arg)
 
-def integrate_clicks(bups, lam=0, s2s=0.001, s2a=.001, s2i=.001, bias=0, B=5., nagents=5, rng=1):
-    make_adapted_clicks(bups, phi=phi, tau_phi, cross_stream=True)
-    integrate_adapted_clicks(bups=bups, lam=lam, s2s=s2s, s2a=s2a, s2i=s2i, bias=bias, B=B, nagents=nagents, rng=rng)
+def integrate_clicks(bups, phi=.1, tau_phi = .05, lam=0, s2s=0.001, s2a=.001, s2i=.001, bias=0,    B=5., nagents=5, rng=1):
+    make_adapted_clicks(bups, phi=phi, tau_phi=tau_phi, cross_stream=True)
+    a = integrate_adapted_clicks(bups=bups, lam=lam, s2s=s2s, s2a=s2a, s2i=s2i, bias=bias, B=B, nagents=nagents, rng=rng)
+    return a
 
 def integrate_adapted_clicks(bups, lam=0, s2s=0.001, s2a=.001, s2i=.001, bias=0, B=5., nagents=5, rng=1):
     """Apply integration process to adapted click train in bups

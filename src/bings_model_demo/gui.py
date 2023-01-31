@@ -20,16 +20,18 @@ def adaptation_eventhandler(change):
     integration_eventhandler(change)
 
 def integration_eventhandler(change):
-    global a, params
-    a, params = bm.integrate_adapted_clicks(bups, lam=lambda_slider.value, s2s=s2s_slider.value,
+    global a
+    a = bm.integrate_adapted_clicks(bups, lam=lambda_slider.value, s2s=s2s_slider.value,
                              s2a=s2a_slider.value, s2i=s2i_slider.value, bias=bias_slider.value,
                              B=B_slider.value, nagents=nagent_slider.value, rng=seed_slider.value)
     choice_eventhandler(change)
 
 def choice_eventhandler(change):
+    choice_params = {"bias":bias_slider.value, "lapse":lapse_slider.value, "B":B_slider.value}
     plot_out.clear_output(wait=True)
     with plot_out:
-        dp.plot_process(bups, a, params)
+        dp.plot_process(bups, a, choice_params)
+        plt.show()
 
 plot_out = widgets.Output()
 
@@ -66,7 +68,7 @@ gamma_slider.observe(clicks_eventhandler, names='value')
 dur_slider.observe(clicks_eventhandler, names='value')
 
 # Define adaptation parameters
-phi_slider = widgets.FloatSlider(value=.1,min=.001,max=1,step=.05,description=r"$\phi$")
+phi_slider = widgets.FloatSlider(value=.1,min=.001,max=1.5,step=.05,description=r"$\phi$")
 tau_phi_slider = widgets.FloatSlider(value=.15,min=.001,max=1,step=.05,description=r"$\tau_{\phi}$")
 
 phi_slider.observe(clicks_eventhandler, names='value')
@@ -74,9 +76,9 @@ tau_phi_slider.observe(clicks_eventhandler, names='value')
 
 # Define integration parameters
 lambda_slider = widgets.FloatSlider(value=0., min = -5., max=5., step=.25, description=r"$\lambda$")
-s2s_slider = widgets.FloatSlider(value=1., min = .001, max=50., step=.25, description=r"$\sigma^2_s$")
-s2a_slider = widgets.FloatSlider(value=.05, min = .001, max=10., step=.25, description=r"$\sigma^2_a$")
-s2i_slider = widgets.FloatSlider(value=.5, min = .001, max=5., step=.25, description=r"$\sigma^2_i$")
+s2s_slider = widgets.FloatSlider(value=.0, min = 0, max=50., step=.25, description=r"$\sigma^2_s$")
+s2a_slider = widgets.FloatSlider(value=.0, min = 0, max=10., step=.25, description=r"$\sigma^2_a$")
+s2i_slider = widgets.FloatSlider(value=0, min = 0, max=5., step=.25, description=r"$\sigma^2_i$")
 B_slider = widgets.FloatSlider(value=10., min = 0., max=25., step=1, description=r"$B$")
 nagent_slider = widgets.IntSlider(value=10, min = 1, max=50, description=r"N samples")
 
