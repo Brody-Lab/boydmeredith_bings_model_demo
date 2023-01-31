@@ -13,7 +13,7 @@ Typical usage example:
 
 import numpy as np
 import scipy as sp
-
+from scipy import special
 
 
 
@@ -85,8 +85,6 @@ def make_adapted_clicks(bups, phi=.1, tau_phi=.2, cross_stream=True):
 
     if not cross_stream:
         raise notImplementedError
-    if phi > 1:
-        raise notImplementedError
 
     # concatenate left and right bups to get interclick intervals
     left_bups = bups['left']
@@ -109,18 +107,46 @@ def make_adapted_clicks(bups, phi=.1, tau_phi=.2, cross_stream=True):
     bups['tvec'] = tvec
     return None
 
+def compute_full_adaptation(bups, phi, tau_phi):
+    """compute adapted clicks and add to bups"""
+    tvec = bups['tvec']
+    dt = np.mean(np.diff(tvec))
+    Cfull = np.ones_like(tvec)
+
+    for (ii, tt) in enumerate(tvec[:-1]):
+        thislb = bups['left_ind'][ii] * 1.
+        thisrb = bups['right_ind'][ii] * 1.
+        if thislb + thisrb == 2. and phi != 1:
+            Cfull[ii] = 0
+        Cdot =  (1-Cfull[ii]) / tau_phi * dt + (phi - 1) * Cfull[ii] * (thislb + thisrb)
+        Cfull[ii+1] = Cfull[ii] + Cdot
+    return tvec,Cfull
+
 def adapt_clicks(phi, tau_phi, bups_cat):
+    """adapt concatenated clicks"""
     ici = np.diff(bups_cat)
     C  = np.ones_like(bups_cat)
     cross_side_suppression = 0
     for ii in np.arange(1,len(C)):
-        if ici[ii-1] <= cross_side_suppression and phi != 1:
+        if ici[ii-1] <= cross_side_suppression:
             C[ii-1] = 0
             C[ii] = 0
             continue
         if abs(phi-1) > 1e-5:
-            adapt_ici(phi, tau_phi, ici, C, ii, style='bing')
+            adapt_ici(phi, tau_phi, ici, C, ii)
     return C
+
+def adapt_ici(phi, tau_phi, ici, C, ii, style='brian'):
+    """adapt clicks based on ici"""
+    arg = (1/tau_phi) * (-ici[ii-1] + special.xlogy(tau_phi, abs(1.-C[ii-1]*phi)))
+    if C[ii-1]*phi <=1:
+        C[ii] = 1. - np.exp(arg)
+    else:
+        C[ii] = 1. + np.exp(arg)
+
+def integrate_clicks(bups, lam=0, s2s=0.001, s2a=.001, s2i=.001, bias=0, B=5., nagents=5, rng=1):
+    make_adapted_clicks(bups, phi=phi, tau_phi, cross_stream=True)
+    integrate_adapted_clicks(bups=bups, lam=lam, s2s=s2s, s2a=s2a, s2i=s2i, bias=bias, B=B, nagents=nagents, rng=rng)
 
 def integrate_adapted_clicks(bups, lam=0, s2s=0.001, s2a=.001, s2i=.001, bias=0, B=5., nagents=5, rng=1):
     """Apply integration process to adapted click train in bups
@@ -136,9 +162,9 @@ def integrate_adapted_clicks(bups, lam=0, s2s=0.001, s2a=.001, s2i=.001, bias=0,
         nagents:
 
     Returns:
-        None
+        a_agents containing nagents relizations of the accumulation process
     """
-    params = {"bias" : bias, "B" : B}
+
     np.random.seed(rng)
     tvec = bups['tvec']
     dt = np.mean(np.diff(tvec))
@@ -176,29 +202,7 @@ def integrate_adapted_clicks(bups, lam=0, s2s=0.001, s2a=.001, s2i=.001, bias=0,
             ii = crossing[0][0]
             a[ii:] = np.ones_like(a[ii:])*np.sign(a[ii])*B
         a_agents[agenti, :] = a
-    return a_agents, params
+    return a_agents
 
-def compute_full_adaptation(bups, phi, tau_phi):
-    tvec = bups['tvec']
-    dt = np.mean(np.diff(tvec))
-    Cfull = np.ones_like(tvec)
 
-    for (ii, tt) in enumerate(tvec[:-1]):
-        thislb = bups['left_ind'][ii] * 1.
-        thisrb = bups['right_ind'][ii] * 1.
-        if thislb + thisrb == 2. and phi != 1:
-            Cfull[ii] = 0
-        Cdot =  (1-Cfull[ii]) / tau_phi * dt + (phi - 1) * Cfull[ii] * (thislb + thisrb)
-        Cfull[ii+1] = Cfull[ii] + Cdot
-    return tvec,Cfull
 
-def adapt_ici(phi, tau_phi, ici, C, ii, style='bing'):
-    if style=='bing':
-        last = tau_phi  * np.log(abs(1 - C[ii-1] * phi))
-        C[ii] = 1 - np.exp((-ici[ii-1] + last) / tau_phi)
-    if style=='brian':
-        arg = (1/tau_phi) * (-ici[ii-1] + sp.special.xlogy(tau_phi, abs(1.-C[ii-1]*phi)))
-        if C[ii]*phi <=1:
-            C[ii] = 1. - np.exp(arg)
-        else:
-            C[ii] = 1. + np.exp(arg)
