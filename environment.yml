@@ -3,7 +3,6 @@ channels:
   - defaults
 dependencies:
   - anyio
-  - appnope
   - argon2-cffi
   - argon2-cffi-bindings
   - asttokens
@@ -75,10 +74,8 @@ dependencies:
   - libdeflate
   - libedit
   - libffi
-  - libgfortran
   - libgfortran5
   - libiconv
-  - libllvm12
   - libpng
   - libpq
   - libsodium
