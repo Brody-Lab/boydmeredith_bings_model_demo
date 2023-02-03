@@ -84,7 +84,7 @@ def make_adapted_clicks(bups, phi=.1, tau_phi=.2, cross_stream=True):
     """
 
     if not cross_stream:
-        raise notImplementedError
+        raise NotImplementedError
 
     # concatenate left and right bups to get interclick intervals
     left_bups = bups['left']
