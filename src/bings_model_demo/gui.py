@@ -4,8 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-import bings_model_demo.model as bm
-import bings_model_demo.plots as dp
+from src.bings_model_demo import model as bm
+from src.bings_model_demo import plots as dp
 
 sns.set_context('notebook')
 
