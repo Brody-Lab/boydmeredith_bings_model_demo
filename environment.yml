@@ -1,4 +1,4 @@
-name: bings_model_demo
+name: tester
 channels:
   - defaults
 dependencies:
@@ -43,6 +43,7 @@ dependencies:
   - idna
   - importlib-metadata
   - importlib_resources
+  - iniconfig
   - intel-openmp
   - ipykernel
   - ipython
@@ -124,6 +125,7 @@ dependencies:
   - pip
   - pkgutil-resolve-name
   - platformdirs
+  - pluggy
   - ply
   - prometheus_client
   - prompt-toolkit
@@ -131,6 +133,7 @@ dependencies:
   - psutil
   - ptyprocess
   - pure_eval
+  - py
   - pycparser
   - pygments
   - pyopenssl
@@ -139,6 +142,7 @@ dependencies:
   - pyqt5-sip
   - pyrsistent
   - pysocks
+  - pytest
   - python
   - python-dateutil
   - python-fastjsonschema
