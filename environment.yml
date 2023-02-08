@@ -9,7 +9,6 @@ dependencies:
   - attrs
   - babel
   - backcall
-  - beautifulsoup4
   - blas
   - bleach
   - bottleneck
