@@ -16,7 +16,8 @@ def clicks_eventhandler(change):
     adaptation_eventhandler(change)
 
 def adaptation_eventhandler(change):
-    bm.make_adapted_clicks(bups, phi=phi_slider.value, tau_phi=tau_phi_slider.value)
+    """Update click adaptation"""
+    bm.make_adapted_clicks(bups, phi=phi_slider.value, tau_phi=tau_phi_slider.value, cancel_stereo=cancel_stereo_check.value)
     integration_eventhandler(change)
 
 def integration_eventhandler(change):
@@ -68,9 +69,11 @@ gamma_slider.observe(clicks_eventhandler, names='value')
 dur_slider.observe(clicks_eventhandler, names='value')
 
 # Define adaptation parameters
+cancel_stereo_check = widgets.Checkbox(value=True, description="Cancel stereo click")
 phi_slider = widgets.FloatSlider(value=.1,min=.001,max=1.5,step=.05,description=r"$\phi$")
 tau_phi_slider = widgets.FloatSlider(value=.15,min=.001,max=1,step=.05,description=r"$\tau_{\phi}$")
 
+cancel_stereo_check.observe(clicks_eventhandler, names='value')
 phi_slider.observe(clicks_eventhandler, names='value')
 tau_phi_slider.observe(clicks_eventhandler, names='value')
 
@@ -96,7 +99,7 @@ bias_slider.observe(clicks_eventhandler, names='value')
 lapse_slider.observe(clicks_eventhandler, names='value')
 
 bup_inputs = widgets.VBox([bups_text, stereo_check, rate_slider, gamma_slider, dur_slider])
-adaptation_inputs = widgets.VBox([adaptation_text, phi_slider, tau_phi_slider])
+adaptation_inputs = widgets.VBox([adaptation_text, cancel_stereo_check, phi_slider, tau_phi_slider])
 integration_inputs = widgets.VBox([integration_text, lambda_slider, s2s_slider, s2a_slider,
                                    s2i_slider, B_slider, nagent_slider])
 choice_inputs = widgets.VBox([choice_text, bias_slider, lapse_slider])

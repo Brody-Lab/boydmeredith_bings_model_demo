@@ -40,7 +40,6 @@ def plot_process(bups, a, params):
         ax[0].spines[spine].set_linewidth(1)
     ax[0].axes.get_xaxis().set_visible(False)
     ax[0].tick_params(left=False)
-    ax[0].set_xlim([-.025, bups['duration']+.025])
 
     plot_adaptation_process(bups, ax=ax[1])
     ax[1].set_xlabel('')
@@ -69,6 +68,9 @@ def plot_process(bups, a, params):
     choice_ax.axes.get_yaxis().set_visible(False)
     choice_ax.set_title("Final $a$")
     choice_ax.set_xlabel("$P(a)$")
+
+    ax[0].set_xlim([-.05, bups['duration']+.025])
+
     sns.despine()
 
     #plot_choices(a, bias=params['bias'], lapse=params['lapse'], ax=choice_ax)
