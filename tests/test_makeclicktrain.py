@@ -2,7 +2,6 @@
 import bings_model_demo.model as bm
 import numpy as np
 
-error() # create an error just to test breaking a PR
 
 def test_totalrate():
     total_rate_in = 40
