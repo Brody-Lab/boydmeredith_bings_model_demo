@@ -70,7 +70,7 @@ def make_clicktrain(total_rate=40, gamma=1.5, duration=.5, dt=.001, stereo_click
 
     return bups
 
-def make_adapted_clicks(bups, phi=.1, tau_phi=.2, cross_stream=True):
+def make_adapted_clicks(bups, phi=.1, tau_phi=.2, cross_stream=True, cancel_stereo=True):
     """Apply adaptation process to click train and record in bups
 
     Args:
@@ -94,7 +94,7 @@ def make_adapted_clicks(bups, phi=.1, tau_phi=.2, cross_stream=True):
     sort_order = np.argsort(bups_cat)
     bups_cat = bups_cat[sort_order]
     sign_cat = sign_cat[sort_order]
-    C = adapt_clicks(phi, tau_phi, bups_cat)
+    C = adapt_clicks(phi, tau_phi, bups_cat, cancel_stereo=cancel_stereo)
 
     left_adapted = C[sign_cat==-1]
     right_adapted = C[sign_cat==1]
@@ -102,13 +102,16 @@ def make_adapted_clicks(bups, phi=.1, tau_phi=.2, cross_stream=True):
     bups['right_adapted'] = right_adapted
 
     # compute the full adaptation process
-    tvec, Cfull = compute_full_adaptation(bups, phi, tau_phi)
+    tvec, Cfull = compute_full_adaptation(bups, phi, tau_phi, cancel_stereo=cancel_stereo)
     bups['Cfull'] = Cfull
     bups['tvec'] = tvec
     return None
 
-def compute_full_adaptation(bups, phi, tau_phi):
+def compute_full_adaptation(bups, phi, tau_phi, cancel_stereo=True):
     """compute adapted clicks and add to bups"""
+    if not cancel_stereo:
+        raise NotImplementedError
+
     tvec = bups['tvec']
     dt = np.mean(np.diff(tvec))
     Cfull = np.ones_like(tvec)
@@ -117,13 +120,15 @@ def compute_full_adaptation(bups, phi, tau_phi):
         thislb = bups['left_ind'][ii] * 1.
         thisrb = bups['right_ind'][ii] * 1.
         if thislb + thisrb == 2. and phi != 1:
-            Cfull[ii] = 0
+             Cfull[ii] = 0
         Cdot =  (1-Cfull[ii]) / tau_phi * dt + (phi - 1) * Cfull[ii] * (thislb + thisrb)
         Cfull[ii+1] = Cfull[ii] + Cdot
     return tvec,Cfull
 
-def adapt_clicks(phi, tau_phi, bups_cat):
+def adapt_clicks(phi, tau_phi, bups_cat, cancel_stereo=True):
     """adapt concatenated clicks"""
+    if not cancel_stereo:
+        raise NotImplementedError
     ici = np.diff(bups_cat)
     C  = np.ones_like(bups_cat)
     cross_side_suppression = 0

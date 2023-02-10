@@ -2,6 +2,7 @@
 import bings_model_demo.model as bm
 import numpy as np
 
+
 def test_totalrate():
     total_rate_in = 40
     dur = 10000
