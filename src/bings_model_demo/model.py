@@ -109,7 +109,7 @@ def make_adapted_clicks(bups, phi=.1, tau_phi=.2, cross_stream=True, cancel_ster
 
 def compute_full_adaptation(bups, phi, tau_phi, cancel_stereo=True):
     """compute adapted clicks and add to bups"""
-    if cancel_stereo:
+    if not cancel_stereo:
         raise NotImplementedError
 
     tvec = bups['tvec']
@@ -127,7 +127,7 @@ def compute_full_adaptation(bups, phi, tau_phi, cancel_stereo=True):
 
 def adapt_clicks(phi, tau_phi, bups_cat, cancel_stereo=True):
     """adapt concatenated clicks"""
-    if cancel_stereo:
+    if not cancel_stereo:
         raise NotImplementedError
     ici = np.diff(bups_cat)
     C  = np.ones_like(bups_cat)
