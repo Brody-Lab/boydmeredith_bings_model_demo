@@ -1,14 +1,4 @@
-"""A one line summary of the module or program, terminated by a period.
-
-Leave one blank line.  The rest of this docstring should contain an
-overall description of the module or program.  Optionally, it may also
-contain a brief description of exported classes and functions and/or usage
-examples.
-
-Typical usage example:
-
-  foo = ClassFoo()
-  bar = foo.FunctionBar()
+"""Creates click trains and corresponding realizations of Bings Model decision variable
 """
 
 import numpy as np
@@ -109,8 +99,6 @@ def make_adapted_clicks(bups, phi=.1, tau_phi=.2, cross_stream=True, cancel_ster
 
 def compute_full_adaptation(bups, phi, tau_phi, cancel_stereo=True):
     """compute adapted clicks and add to bups"""
-    if not cancel_stereo:
-        raise NotImplementedError
 
     tvec = bups['tvec']
     dt = np.mean(np.diff(tvec))
@@ -119,29 +107,34 @@ def compute_full_adaptation(bups, phi, tau_phi, cancel_stereo=True):
     for (ii, tt) in enumerate(tvec[:-1]):
         thislb = bups['left_ind'][ii] * 1.
         thisrb = bups['right_ind'][ii] * 1.
-        if thislb + thisrb == 2. and phi != 1:
+        if thislb + thisrb == 2. and phi != 1 and cancel_stereo:
              Cfull[ii] = 0
+        if thislb + thisrb == 2. and phi != 1 and ~cancel_stereo:
+            thislb = .5
+            thisrb = .5
         Cdot =  (1-Cfull[ii]) / tau_phi * dt + (phi - 1) * Cfull[ii] * (thislb + thisrb)
         Cfull[ii+1] = Cfull[ii] + Cdot
     return tvec,Cfull
 
 def adapt_clicks(phi, tau_phi, bups_cat, cancel_stereo=True):
     """adapt concatenated clicks"""
-    if not cancel_stereo:
-        raise NotImplementedError
+
     ici = np.diff(bups_cat)
     C  = np.ones_like(bups_cat)
     cross_side_suppression = 0
     for ii in np.arange(1,len(C)):
-        if ici[ii-1] <= cross_side_suppression:
+        if (ici[ii-1] <= cross_side_suppression) & cancel_stereo:
             C[ii-1] = 0
             C[ii] = 0
+            continue
+        if (ici[ii-1] <= cross_side_suppression) & ~cancel_stereo:
+            C[ii] = C[ii-1]
             continue
         if abs(phi-1) > 1e-5:
             adapt_ici(phi, tau_phi, ici, C, ii)
     return C
 
-def adapt_ici(phi, tau_phi, ici, C, ii, style='brian'):
+def adapt_ici(phi, tau_phi, ici, C, ii):
     """adapt clicks based on ici"""
     arg = (1/tau_phi) * (-ici[ii-1] + special.xlogy(tau_phi, abs(1.-C[ii-1]*phi)))
     if C[ii-1]*phi <=1:
