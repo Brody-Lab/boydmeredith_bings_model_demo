@@ -21,17 +21,22 @@ def adaptation_eventhandler(change):
     integration_eventhandler(change)
 
 def integration_eventhandler(change):
-    global a
-    a = bm.integrate_adapted_clicks(bups, lam=lambda_slider.value, s2s=s2s_slider.value,
+    global a, analyt_mean, analyt_var, PARAMS
+    PARAMS = {'lambda':lambda_slider.value, 'phi':phi_slider.value, 'tau_phi':tau_phi_slider.value,
+    's2i':s2i_slider.value, 's2s':s2s_slider.value, 's2a':s2a_slider.value}
+    analyt_mean, analyt_var = bm.compute_analytical_model(bups, PARAMS, cancel_stereo=cancel_stereo_check.value)
+    a = bm.integrate_adapted_clicks(bups, lam=lambda_slider.value,s2s=s2s_slider.value,
                              s2a=s2a_slider.value, s2i=s2i_slider.value, bias=bias_slider.value,
                              B=B_slider.value, nagents=nagent_slider.value, rng=seed_slider.value)
     choice_eventhandler(change)
 
 def choice_eventhandler(change):
-    choice_params = {"bias":bias_slider.value, "lapse":lapse_slider.value, "B":B_slider.value}
+    PARAMS['bias'] = bias_slider.value
+    PARAMS['B'] = B_slider.value
+    PARAMS['lapse'] = lapse_slider.value
     plot_out.clear_output(wait=True)
     with plot_out:
-        dp.plot_process(bups, a, choice_params)
+        dp.plot_process(bups, a, analyt_mean, analyt_var, PARAMS)
         plt.show()
 
 plot_out = widgets.Output()
@@ -83,7 +88,7 @@ s2s_slider = widgets.FloatSlider(value=.0, min = 0, max=50., step=.25, descripti
 s2a_slider = widgets.FloatSlider(value=.0, min = 0, max=10., step=.25, description=r"$\sigma^2_a$")
 s2i_slider = widgets.FloatSlider(value=0, min = 0, max=5., step=.25, description=r"$\sigma^2_i$")
 B_slider = widgets.FloatSlider(value=10., min = 0., max=25., step=1, description=r"$B$")
-nagent_slider = widgets.IntSlider(value=10, min = 1, max=50, description=r"N samples")
+nagent_slider = widgets.IntSlider(value=10, min = 5, max=100, description=r"N samples")
 
 lambda_slider.observe(clicks_eventhandler, names='value')
 s2s_slider.observe(clicks_eventhandler, names='value')

@@ -77,13 +77,7 @@ def make_adapted_clicks(bups, phi=.1, tau_phi=.2, cross_stream=True, cancel_ster
         raise NotImplementedError
 
     # concatenate left and right bups to get interclick intervals
-    left_bups = bups['left']
-    right_bups = bups['right']
-    bups_cat = np.hstack([left_bups, right_bups])
-    sign_cat = np.hstack([-np.ones_like(left_bups), np.ones_like(right_bups)])
-    sort_order = np.argsort(bups_cat)
-    bups_cat = bups_cat[sort_order]
-    sign_cat = sign_cat[sort_order]
+    bups_cat, sign_cat = get_bups_cat(bups)
     C = adapt_clicks(phi, tau_phi, bups_cat, cancel_stereo=cancel_stereo)
 
     left_adapted = C[sign_cat==-1]
@@ -95,7 +89,21 @@ def make_adapted_clicks(bups, phi=.1, tau_phi=.2, cross_stream=True, cancel_ster
     tvec, Cfull = compute_full_adaptation(bups, phi, tau_phi, cancel_stereo=cancel_stereo)
     bups['Cfull'] = Cfull
     bups['tvec'] = tvec
+    bups['strength_cat'] = C * sign_cat
+    bups['times_cat'] = bups_cat
+    bups['sign_cat'] = sign_cat
     return None
+
+def get_bups_cat(bups):
+    """"Return a sorted list of click times and click signs"""
+    left_bups = bups['left']
+    right_bups = bups['right']
+    bups_cat = np.hstack([left_bups, right_bups])
+    sign_cat = np.hstack([-np.ones_like(left_bups), np.ones_like(right_bups)])
+    sort_order = np.argsort(bups_cat)
+    bups_cat = bups_cat[sort_order]
+    sign_cat = sign_cat[sort_order]
+    return bups_cat, sign_cat
 
 def compute_full_adaptation(bups, phi, tau_phi, cancel_stereo=True):
     """compute adapted clicks and add to bups"""
@@ -173,8 +181,8 @@ def integrate_adapted_clicks(bups, lam=0, s2s=0.001, s2a=.001, s2i=.001, bias=0,
     right_adapted = bups['right_adapted'].copy()
     left_ts = bups['left']
     right_ts = bups['right']
-    left_adapted *= np.exp(lam * (dur - left_ts))
-    right_adapted *= np.exp(lam * (dur - right_ts))
+    #left_adapted *= np.exp(lam * (dur - left_ts))
+    #right_adapted *= np.exp(lam * (dur - right_ts))
     a_agents = np.zeros([nagents, len(tvec)])
     for agenti in np.arange(nagents):
         left_vals = np.zeros_like(tvec)
@@ -202,6 +210,21 @@ def integrate_adapted_clicks(bups, lam=0, s2s=0.001, s2a=.001, s2i=.001, bias=0,
             a[ii:] = np.ones_like(a[ii:])*np.sign(a[ii])*B
         a_agents[agenti, :] = a
     return a_agents
+
+def compute_analytical_model(bups, params, cancel_stereo=True, cross_stream=True):
+    phi, tau_phi = params['phi'], params['tau_phi']
+    lam = params['lambda']
+    init_var, a_var, click_var = params['s2i'], params['s2a'], params['s2s']
+    dur = bups['duration']
+    make_adapted_clicks(bups, phi=phi, tau_phi=tau_phi, cancel_stereo=cancel_stereo,  cross_stream=cross_stream)
+    ma = 0
+    total_var = init_var*np.exp(2*lam*dur)
+    total_var += a_var*dur if (abs(lam) < 1e-1) else a_var / (2*lam) * (np.exp(2*lam*dur)-1)
+    for (bupstrength, buptime) in zip(bups['strength_cat'], bups['times_cat']):
+        ma += bupstrength*np.exp(lam * (dur - buptime))
+        total_var = total_var + click_var * np.abs(bupstrength) * np.exp(2*lam*(dur - buptime))
+
+    return ma, total_var
 
 
 

@@ -10,8 +10,9 @@ import seaborn as sns
 left_color = "purple"
 right_color = "green"
 model_color = "pink"
+analyt_color = "steelblue"
 
-def plot_process(bups, a, params):
+def plot_process(bups, a, analyt_mean, analyt_var, params):
     """
     Create a figure summarizing accumulation process
 
@@ -64,11 +65,21 @@ def plot_process(bups, a, params):
     choice_ax.axhline(params['bias'],ls=":", color="black")
     choice_ax.axhline(params['B'],ls="-", color="black")
     choice_ax.axhline(-params['B'],ls="-", color="black")
-    choice_ax.set_ylim(ax[3].get_ylim())
+    yl = ax[3].get_ylim()
+    choice_ax.set_ylim(yl)
     choice_ax.axes.get_yaxis().set_visible(False)
     choice_ax.set_title("Final $a$")
     choice_ax.set_xlabel("$P(a)$")
-
+    # Plot the analytical model approximation
+    if analyt_var > 1e-4:
+        a_pdf = sp.stats.norm(loc=analyt_mean, scale=np.sqrt(analyt_var))
+        aa = np.linspace(yl[0],yl[-1],100)
+        plt.plot(a_pdf.pdf(aa), aa, color=analyt_color)
+    choice_ax.plot(choice_ax.get_xlim() , np.ones(2)*final_a.mean(), '-', color=model_color,
+        label=r"empirical")
+    choice_ax.plot(choice_ax.get_xlim() , np.ones(2)*analyt_mean, '-', color=analyt_color,
+        label=r"analytical")
+    plt.legend(bbox_to_anchor=(1.1,1,0,0))
     ax[0].set_xlim([-.05, bups['duration']+.025])
 
     sns.despine()
