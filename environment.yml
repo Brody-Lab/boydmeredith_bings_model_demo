@@ -1,4 +1,4 @@
-name: test-env
+name: bings-model-demo-env
 channels:
   - defaults
 dependencies:
